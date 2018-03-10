@@ -8,6 +8,7 @@ def crawler(seed):
     i=0
     infoGlob={}
     info=[]
+    infoA=[]
     taille=[]
     while frontier:
         size=len(frontier)
@@ -27,33 +28,44 @@ def crawler(seed):
             #print(len(author),len(headline),len(date))
             taille.append([len(author),len(headline),len(date)])
             infoArticle=[]
+            infoAuthor=[]
             if(len(author)!=0 and len(headline)!=0 and len(date)!=0):
-                infoArticle.append(author[0].text)
+                for x in range(0,len(author)):
+                    #add all the authors
+                    infoAuthor.append(author[x].text)
                 headlineText=headline[0].text
                 headlineText=headlineText.replace('\n','')
+                headlineText=headlineText.replace('\u200b','')
                 infoArticle.append(headlineText)
                 dateText=date[0].text
                 dateText=dateText.replace('\xa0',' ')
                 dateText=dateText.replace('\n','')
+                dateText=dateText.replace('\u200b','')
                 infoArticle.append(dateText)
             elif(len(author)==0 and len(headline)!=0 and len(date)!=0):
+                infoAuthor.append("No author")
                 headlineText=headline[0].text
                 headlineText=headlineText.replace('\n','')
+                headlineText=headlineText.replace('\u200b','')
                 infoArticle.append(headlineText)
                 dateText=date[0].text
                 dateText=dateText.replace('\xa0',' ')
                 dateText=dateText.replace('\n','')
+                dateText=dateText.replace('\u200b','')
                 infoArticle.append(dateText)
+            infoA.append(infoAuthor)
             info.append(infoArticle)
             if page not in crawled:
                 for link in links:
                     linkText=link.text
+                    #filter to only have news article
                     if("jpg" not in linkText and "png" not in linkText and "live" not in linkText):
                         frontier.append(link.text)
                 crawled.append(page)
         except Exception as e:
-           print(e)
+            print(e)
     print(len(frontier))
+    infoGlob["author"]=infoA
     infoGlob["article"]=info
     jSoninfoGlob=json.dumps(infoGlob, ensure_ascii=False)
     with open('C://Users//R510J//Desktop//Travail//Inge//Algorithme//Python//data.json', 'w') as f:
@@ -64,5 +76,6 @@ crawler('https://www.theguardian.com/sitemaps/news.xml')
 json_file=open('C://Users//R510J//Desktop//Travail//Inge//Algorithme//Python//data.json','r')
 data = json.load(json_file) #load for loading from a file, loads for loading from a string
 data1=json.loads(data)
+#print(data1["author"])
 #print(data1["article"])
 json_file.close()
